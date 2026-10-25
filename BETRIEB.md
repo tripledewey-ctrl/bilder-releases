@@ -28,6 +28,22 @@ hier nichts.
 Ein eigenes internes Issue nachträglich einem Kunden-Anliegen zuordnen: in seine Beschreibung
 (oder in die des Pull Requests) die Zeile `Kunden-Issue: #7` schreiben.
 
+## Windows-Build hier (kostenlose Minuten)
+
+Die exe wird **hier** gebaut (`.github/workflows/build.yml`), weil Actions-Minuten für
+öffentliche Repos nichts kosten. Das private Repo testet nur unter Linux und stößt den Build
+per `repository_dispatch` an:
+
+```text
+privat ci.yml/release.yml ──"bauen"──► build.yml: privaten Stand holen (KUNDEN_TOKEN),
+  exe bauen + starten, Artefakt (14 bzw. 30 Tage) ─► Testversion / Releases ─"exe-gebaut"─► privat
+```
+
+- Auslösen kann ihn nur, wer Schreibrechte hat – also nur das private Repo.
+- Lauf-Logs und exe-Artefakte sind öffentlich bzw. für angemeldete Nutzer sichtbar; der
+  Quellcode wird nicht veröffentlicht.
+- Läufe: *Actions → Windows-Build*, Titel `Bilder <Version> · <Commit>`.
+
 ## Einrichtung (einmalig)
 
 ### 1. Token anlegen
@@ -39,7 +55,7 @@ GitHub → *Settings → Developer settings → Fine-grained personal access tok
 | Name | `bilder-kunden` |
 | Expiration | 1 Jahr (Erinnerung setzen!) |
 | Repository access | *Only select repositories*: `bilder` **und** `bilder-releases` |
-| Permissions → Contents | Read and write (Releases anlegen) |
+| Permissions → Contents | Read and write (Quellcode holen, Releases, Build anstoßen) |
 | Permissions → Issues | Read and write |
 
 ### 2. Token in **beiden** Repos hinterlegen
