@@ -22,8 +22,8 @@ Release-Lauf (bilder, Kanal rc/stable)
         stable: alle offenen "behoben"-Anliegen bekommen Download-Link und werden geschlossen
 ```
 
-Feature-Vorabversionen und CI-Builds bleiben intern. Ein Branch ohne Kunden-Issue erzeugt
-hier nichts.
+Releases gibt es hier nur für rc/stable (Feature-Vorabversionen bleiben im privaten Repo).
+Ein Branch ohne Kunden-Issue erzeugt hier nur ein Build-Artefakt, keine Testversion.
 
 Ein eigenes internes Issue nachträglich einem Kunden-Anliegen zuordnen: in seine Beschreibung
 (oder in die des Pull Requests) die Zeile `Kunden-Issue: #7` schreiben.
