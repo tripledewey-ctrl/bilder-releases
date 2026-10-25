@@ -1,0 +1,130 @@
+# Windows-Build der Bilder.exe – hier im öffentlichen Repo, weil Actions-Minuten für
+# öffentliche Repos nichts kosten. Angestoßen nur vom privaten Repo (kunden.py bauen,
+# braucht Schreibrechte), nie von Fremden. Der Quellcode wird nur für den Build geholt
+# und nicht veröffentlicht; Artefakte (exe) sind für angemeldete GitHub-Nutzer ladbar.
+#
+#   art=ci       exe als Artefakt (14 Tage); gehört der Branch zu einem Anliegen, zusätzlich
+#                Testversion "test-issue-<nr>" + Kommentar. Danach Meldung ans private Repo.
+#   art=release  Release mit exe im privaten Repo; rc/stable zusätzlich hier.
+name: Windows-Build
+run-name: "Bilder ${{ github.event.client_payload.version }} · ${{ github.event.client_payload.sha }}"
+
+on:
+  repository_dispatch:
+    types: [bauen]
+
+concurrency:
+  group: bauen-${{ github.event.client_payload.art }}-${{ github.event.client_payload.ref }}
+  cancel-in-progress: ${{ github.event.client_payload.art == 'ci' }}
+
+permissions:
+  contents: read
+
+env:
+  INTERN_REPO: ${{ github.event.client_payload.intern || 'tripledewey-ctrl/bilder' }}
+
+jobs:
+  build:
+    name: exe bauen und prüfen
+    runs-on: windows-latest
+    outputs:
+      artifact-url: ${{ steps.upload.outputs.artifact-url }}
+      sha256: ${{ steps.paket.outputs.sha256 }}
+    defaults:
+      run:
+        working-directory: src/bilder-app
+    env:
+      VERSION: ${{ github.event.client_payload.version }}
+      CHANNEL: ${{ github.event.client_payload.channel }}
+      BUILD_SHA: ${{ github.event.client_payload.sha }}
+    steps:
+      - name: Quellcode holen (privat)
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ env.INTERN_REPO }}
+          ref: ${{ github.event.client_payload.sha }}
+          token: ${{ secrets.KUNDEN_TOKEN }}
+          path: src
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+          cache-dependency-glob: src/bilder-app/uv.lock
+      - run: uv sync --frozen
+
+      - name: Version in die App schreiben
+        run: uv run --no-sync python ../.github/scripts/build_meta.py write-info "$env:VERSION" "$env:CHANNEL"
+
+      - name: PyInstaller
+        run: uv run --no-sync pyinstaller bilder.spec --noconfirm --log-level WARN --distpath dist --workpath build
+
+      - name: exe starten und prüfen
+        run: uv run --no-sync python ../.github/scripts/smoke_test.py dist/Bilder.exe "$env:VERSION"
+
+      - name: Paket zusammenstellen
+        id: paket
+        shell: pwsh
+        run: |
+          $out = New-Item -ItemType Directory -Force "out"
+          $exe = "Bilder-$env:VERSION.exe" -replace '\+', '_'
+          Copy-Item dist/Bilder.exe (Join-Path $out $exe)
+          $hash = (Get-FileHash (Join-Path $out $exe) -Algorithm SHA256).Hash.ToLower()
+          "$hash  $exe" | Set-Content -Encoding ascii (Join-Path $out "$exe.sha256")
+          "sha256=$hash" >> $env:GITHUB_OUTPUT
+          "## Bilder.exe $env:VERSION`n`nKanal: **$env:CHANNEL** · SHA256: ``$hash``" >> $env:GITHUB_STEP_SUMMARY
+
+      - uses: actions/upload-artifact@v6
+        id: upload
+        with:
+          name: ${{ github.event.client_payload.artifact }}
+          path: src/bilder-app/out/*
+          retention-days: ${{ github.event.client_payload.art == 'release' && 30 || 14 }}
+          if-no-files-found: error
+
+  veroeffentlichen:
+    name: Veröffentlichen und melden
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      KUNDEN_TOKEN: ${{ secrets.KUNDEN_TOKEN }}
+      KUNDEN_REPO: ${{ github.repository }}
+      ART: ${{ github.event.client_payload.art }}
+      SHA: ${{ github.event.client_payload.sha }}
+      REF: ${{ github.event.client_payload.ref }}
+      VERSION: ${{ github.event.client_payload.version }}
+      CHANNEL: ${{ github.event.client_payload.channel }}
+      ARTIFACT: ${{ github.event.client_payload.artifact }}
+      TAG: ${{ github.event.client_payload.tag }}
+      KUNDE: ${{ github.event.client_payload.kunde }}
+      URL: ${{ needs.build.outputs.artifact-url }}
+      SHA256: ${{ needs.build.outputs.sha256 }}
+      RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    steps:
+      - name: Skripte holen (privat)
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ env.INTERN_REPO }}
+          ref: ${{ github.event.client_payload.sha }}
+          token: ${{ secrets.KUNDEN_TOKEN }}
+          sparse-checkout: .github/scripts
+          persist-credentials: false
+      - uses: actions/download-artifact@v7
+        with:
+          name: ${{ github.event.client_payload.artifact }}
+          path: out
+
+      - name: Testversion fürs Kunden-Anliegen
+        if: env.ART == 'ci' && env.KUNDE != ''
+        run: python3 .github/scripts/kunden.py test-exe out
+
+      - name: Release im privaten Repo
+        if: env.ART == 'release'
+        run: python3 .github/scripts/kunden.py intern-release out
+
+      - name: Release hier (rc/stable)
+        if: env.ART == 'release' && env.CHANNEL != 'feature'
+        run: python3 .github/scripts/kunden.py release out
+
+      - name: Ans private Repo melden (Kommentar im Pull Request)
+        if: env.ART == 'ci'
+        run: python3 .github/scripts/kunden.py melden
