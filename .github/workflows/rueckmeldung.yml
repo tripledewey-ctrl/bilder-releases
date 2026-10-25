@@ -1,0 +1,35 @@
+# Kunde antwortet mit "/ok" oder "/fehler" -> Label setzen und Entwicklung benachrichtigen.
+name: Rückmeldung
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  rueckmeldung:
+    name: Rückmeldung zur Testversion
+    if: >-
+      !github.event.issue.pull_request &&
+      (startsWith(github.event.comment.body, '/ok') || startsWith(github.event.comment.body, '/fehler') ||
+       startsWith(github.event.comment.body, '/OK') || startsWith(github.event.comment.body, '/Fehler'))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          sparse-checkout: .github/scripts
+      - name: Auswerten
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          KUNDEN_TOKEN: ${{ secrets.KUNDEN_TOKEN }}
+          INTERN_REPO: ${{ vars.INTERN_REPO }}
+          REPO_OWNER: ${{ github.repository_owner }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_AUTHOR: ${{ github.event.issue.user.login }}
+          COMMENT_BODY: ${{ github.event.comment.body }}
+          COMMENT_AUTHOR: ${{ github.event.comment.user.login }}
+          COMMENT_URL: ${{ github.event.comment.html_url }}
+        run: python3 .github/scripts/anliegen.py rueckmeldung

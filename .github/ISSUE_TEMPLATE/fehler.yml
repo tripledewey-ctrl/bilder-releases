@@ -1,0 +1,52 @@
+name: Etwas funktioniert nicht
+description: Ein Fehler, eine Fehlermeldung oder etwas verhält sich anders als erwartet
+title: "Fehler: "
+labels: [fehler]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Danke, dass Sie sich die Zeit nehmen! Je genauer Sie beschreiben, was passiert ist,
+        desto schneller können wir helfen. **Bitte keine echten Namen, Fotos von Personen oder
+        Dateinamen aus Ihrer Sammlung** – dieses Anliegen ist öffentlich sichtbar.
+  - type: input
+    id: version
+    attributes:
+      label: Welche Version benutzen Sie?
+      description: Steht in der App ganz oben neben „Bilder“, z. B. 0.2.0
+      placeholder: "0.2.0"
+    validations:
+      required: true
+  - type: textarea
+    id: schritte
+    attributes:
+      label: Was haben Sie gemacht?
+      description: Schritt für Schritt, so dass wir es nachmachen können.
+      placeholder: |
+        1. Seite „Personen“ geöffnet
+        2. Auf „Zusammenführen“ geklickt
+        3. …
+    validations:
+      required: true
+  - type: textarea
+    id: ergebnis
+    attributes:
+      label: Was ist passiert – und was hätten Sie erwartet?
+    validations:
+      required: true
+  - type: textarea
+    id: meldung
+    attributes:
+      label: Fehlermeldung (falls vorhanden)
+      description: Text aus dem schwarzen Konsolenfenster oder von der Seite „Config & Scans“. Gern auch ein Bildschirmfoto ohne erkennbare Gesichter.
+      render: text
+  - type: dropdown
+    id: dringend
+    attributes:
+      label: Wie sehr stört es?
+      options:
+        - Ich kann nicht weiterarbeiten
+        - Es stört, aber es geht irgendwie
+        - Nur eine Kleinigkeit
+    validations:
+      required: true

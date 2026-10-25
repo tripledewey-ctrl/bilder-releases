@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Neueste Version herunterladen
+    url: https://github.com/tripledewey-ctrl/bilder-releases/releases/latest
+    about: Die aktuelle Bilder.exe – vielleicht ist Ihr Anliegen dort schon gelöst.
+  - name: Anleitung
+    url: https://github.com/tripledewey-ctrl/bilder-releases#readme
+    about: Installieren, aktualisieren, Testversionen ausprobieren

@@ -1,0 +1,29 @@
+name: Wunsch oder Verbesserung
+description: Etwas soll neu dazukommen, einfacher oder besser werden
+title: "Wunsch: "
+labels: [wunsch]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Wir freuen uns über jede Idee! **Bitte keine echten Namen, Fotos von Personen oder
+        Dateinamen aus Ihrer Sammlung** – dieses Anliegen ist öffentlich sichtbar.
+        Platzhalter wie „Erika Mustermann“ reichen völlig.
+  - type: textarea
+    id: heute
+    attributes:
+      label: Was stört Sie heute oder was fehlt?
+      description: Wo in der App (Seite, Knopf)?
+    validations:
+      required: true
+  - type: textarea
+    id: wunsch
+    attributes:
+      label: Wie hätten Sie es gern?
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Welche Version benutzen Sie?
+      description: Steht in der App ganz oben neben „Bilder“ (optional)

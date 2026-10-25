@@ -1,0 +1,39 @@
+# Neues Anliegen -> internes Issue im privaten Entwicklungs-Repo (dort Branch + Testversion).
+# Ist die Repo-Variable KUNDEN gesetzt (Komma-Liste von GitHub-Namen), werden nur deren
+# Anliegen sofort aufgenommen; andere bekommen das Label "pruefen" und lassen sich durch
+# das Label "aufnehmen" nachträglich übernehmen.
+name: Anliegen aufnehmen
+
+on:
+  issues:
+    types: [opened, labeled]
+
+concurrency:
+  group: anliegen-${{ github.event.issue.number }}
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  aufnehmen:
+    name: Anliegen aufnehmen
+    if: github.event.action == 'opened' || github.event.label.name == 'aufnehmen'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          sparse-checkout: .github/scripts
+      - name: Aufnehmen
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          KUNDEN_TOKEN: ${{ secrets.KUNDEN_TOKEN }}
+          INTERN_REPO: ${{ vars.INTERN_REPO }}
+          KUNDEN: ${{ vars.KUNDEN }}
+          REPO_OWNER: ${{ github.repository_owner }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_AUTHOR: ${{ github.event.issue.user.login }}
+          ISSUE_LABELS: ${{ join(github.event.issue.labels.*.name, ',') }}
+        run: python3 .github/scripts/anliegen.py aufnehmen
