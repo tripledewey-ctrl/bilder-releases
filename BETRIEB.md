@@ -36,7 +36,7 @@ per `repository_dispatch` an:
 
 ```text
 privat ci.yml/release.yml ──"bauen"──► build.yml: privaten Stand holen (KUNDEN_TOKEN),
-  exe bauen + starten, Artefakt (14 bzw. 30 Tage) ─► Testversion / Releases ─"exe-gebaut"─► privat
+  exe bauen + starten, Artefakt (7 Tage, je Branch nur das neueste) ─► Testversion / Releases ─"exe-gebaut"─► privat
 ```
 
 - Auslösen kann ihn nur, wer Schreibrechte hat – also nur das private Repo.
