@@ -3,9 +3,10 @@
 # braucht Schreibrechte), nie von Fremden. Der Quellcode wird nur für den Build geholt
 # und nicht veröffentlicht; Artefakte (exe) sind für angemeldete GitHub-Nutzer ladbar.
 #
-#   art=ci       exe als Artefakt (14 Tage); gehört der Branch zu einem Anliegen, zusätzlich
+#   art=ci       exe als Artefakt (7 Tage, ältere desselben Branches werden gelöscht); gehört der Branch zu einem Anliegen, zusätzlich
 #                Testversion "test-issue-<nr>" + Kommentar. Danach Meldung ans private Repo.
-#   art=release  Release mit exe im privaten Repo; rc/stable zusätzlich hier.
+#   art=release  Release mit exe im privaten Repo; rc/stable zusätzlich hier. Das Artefakt
+#                dient nur der Übergabe zwischen den Jobs (1 Tag).
 name: Windows-Build
 run-name: "Bilder ${{ github.event.client_payload.version }} · ${{ github.event.client_payload.sha }}"
 
@@ -78,13 +79,16 @@ jobs:
         with:
           name: ${{ github.event.client_payload.artifact }}
           path: src/bilder-app/out/*
-          retention-days: ${{ github.event.client_payload.art == 'release' && 30 || 14 }}
+          retention-days: ${{ github.event.client_payload.art == 'release' && 1 || 7 }}
           if-no-files-found: error
 
   veroeffentlichen:
     name: Veröffentlichen und melden
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write   # ältere Artefakte löschen
     env:
       KUNDEN_TOKEN: ${{ secrets.KUNDEN_TOKEN }}
       KUNDEN_REPO: ${{ github.repository }}
@@ -128,3 +132,12 @@ jobs:
       - name: Ans private Repo melden (Kommentar im Pull Request)
         if: env.ART == 'ci'
         run: python3 .github/scripts/kunden.py melden
+
+      # Je Branch nur die neueste exe behalten (je ~100 MB). Ältere Stände des privaten
+      # Repos kennen den Befehl noch nicht -> kein Abbruch.
+      - name: Ältere Artefakte desselben Branches löschen
+        if: env.ART == 'ci'
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 .github/scripts/kunden.py aufraeumen
