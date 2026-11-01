@@ -4,6 +4,41 @@ Hier gibt es die **Bilder-App** zum Herunterladen, und hier können Sie uns **Fe
 Wünsche** melden. Zu jedem Anliegen bekommen Sie eine **Testversion**, die Sie selbst
 ausprobieren können, bevor die Änderung in die nächste Version kommt.
 
+**Neu hier?** → **[Erste Schritte](ERSTE-SCHRITTE.md)** – in einer Viertelstunde startklar.
+
+## Was ist Bilder?
+
+**Bilder** bringt Ordnung in große Fotosammlungen: Die App findet auf Ihren Fotos die
+Gesichter, lernt, wer wer ist, und zeigt Ihnen auf Knopfdruck alle Bilder einer Person.
+Haben Sie früher mit **Picasa** Personen markiert, wird diese Arbeit in wenigen Minuten
+übernommen.
+
+Die App läuft komplett **auf Ihrem PC** – ohne Konto, ohne Cloud, ohne Installation.
+Sie bedienen sie im Browser, Ihre Fotos werden dabei **nur gelesen** und nie verändert,
+verschoben oder hochgeladen.
+
+### Das kann die App
+
+- 🙂 **Gesichtserkennung** – findet alle Gesichter auf Ihren Fotos, auch auf älteren und
+  kleinen Bildern.
+- 👪 **Personen benennen** – Namen vergeben, einzeln oder viele ähnliche Gesichter auf einmal.
+  Jeder Name verbessert die nächsten Vorschläge.
+- 💡 **Automatische Vorschläge** – die App erkennt bekannte Personen selbst wieder; Sie
+  bestätigen oder lehnen mit einem Klick ab.
+- 🗂️ **Picasa-Übernahme** – Personen und Gesichtsmarkierungen aus Picasa werden übernommen,
+  Picasa muss dafür nicht mehr installiert sein.
+- 🔎 **Suchen und filtern** – nach Person, Ordner, Dateiname, WhatsApp-Bildern; sortiert nach
+  Aufnahmedatum.
+- 📷 **Bilddetails** – Aufnahmedatum, Kamera und Ort (GPS); auch HEIC-Fotos vom iPhone und
+  WhatsApp-Bilder ohne Datum werden richtig eingeordnet.
+- 🧩 **Duplikate finden** – zeigt doppelte Fotos (z. B. Original und WhatsApp-Kopie), ohne
+  etwas zu löschen.
+- 📁 **Mehrere Fotoordner** – lokale Festplatte, USB-Platte oder NAS; zieht ein Ordner um,
+  bleiben alle Namen erhalten.
+- ⏸️ **Fortsetzbar** – große Sammlungen werden nebenbei eingelesen; Anhalten und später
+  weitermachen ist jederzeit möglich.
+- 🔒 **Privat** – alles bleibt auf Ihrem PC, Ihre Arbeit steckt im Ordner `Data` neben der App.
+
 ## ⬇️ Herunterladen
 
 **[Neueste Version herunterladen](https://github.com/tripledewey-ctrl/bilder-releases/releases/latest)**
